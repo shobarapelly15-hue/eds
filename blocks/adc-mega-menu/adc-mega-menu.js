@@ -25,9 +25,12 @@
  */
 function findNavContentEl(block) {
   const candidates = [...block.querySelectorAll('div')];
-  return candidates.find(
-    (div) => [...div.children].some((c) => c.tagName === 'UL' || c.tagName === 'P'),
-  ) || block;
+  // Prefer the field that actually holds a list (the navigation field); only fall
+  // back to a heading paragraph if no list exists. This avoids mistaking the
+  // accessibility-label <p> for the nav content.
+  return candidates.find((div) => [...div.children].some((c) => c.tagName === 'UL'))
+    || candidates.find((div) => [...div.children].some((c) => c.tagName === 'P'))
+    || block;
 }
 
 /**
