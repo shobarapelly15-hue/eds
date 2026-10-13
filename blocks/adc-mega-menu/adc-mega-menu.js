@@ -74,6 +74,37 @@ function normalizeToNestedList(content) {
   return ul;
 }
 
+/**
+ * Ensure every list item has a leading <a> label. Authors commonly type plain
+ * text or <p> headings instead of links; the renderers expect an anchor per
+ * item, so synthesise one (href "#") from the item's own text when missing.
+ */
+function ensureAnchorLabels(ul) {
+  ul.querySelectorAll('li').forEach((li) => {
+    if (li.querySelector(':scope > a')) return;
+    const heading = li.querySelector(':scope > p');
+    let text;
+    let href = '#';
+    if (heading) {
+      const innerAnchor = heading.querySelector('a');
+      text = (innerAnchor || heading).textContent.trim();
+      if (innerAnchor?.getAttribute('href')) href = innerAnchor.getAttribute('href');
+      heading.remove();
+    } else {
+      const clone = li.cloneNode(true);
+      clone.querySelectorAll('ul').forEach((nested) => nested.remove());
+      text = clone.textContent.trim();
+      [...li.childNodes].forEach((n) => { if (n.nodeType === Node.TEXT_NODE) n.remove(); });
+    }
+    if (!text) return;
+    const anchor = document.createElement('a');
+    anchor.setAttribute('href', href);
+    anchor.textContent = text;
+    li.prepend(anchor);
+  });
+  return ul;
+}
+
 function buildDesktopNav(ul) {
   const nav = document.createElement('nav');
   nav.className = 'adc-mega-menu-nav';
@@ -301,6 +332,7 @@ export default function decorate(block) {
   const navContent = findNavContentEl(block);
   const ul = normalizeToNestedList(navContent);
   if (!ul || !ul.querySelector('li')) return;
+  ensureAnchorLabels(ul);
 
   const wrapper = document.createElement('div');
   wrapper.className = 'adc-mega-menu-wrapper';
