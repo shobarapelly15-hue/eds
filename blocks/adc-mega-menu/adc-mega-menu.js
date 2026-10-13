@@ -24,13 +24,14 @@
  * the accessibility label.
  */
 function findNavContentEl(block) {
+  // The navigation field is the one that contains a list. Find the first list
+  // anywhere in the block and use its container, so field order or extra wrapper
+  // elements (e.g. the accessibility-label paragraph) can't be mistaken for it.
+  const list = block.querySelector('ul');
+  if (list) return list.parentElement || block;
+  // No list authored yet: fall back to a heading paragraph (Pattern A).
   const candidates = [...block.querySelectorAll('div')];
-  // Prefer the field that actually holds a list (the navigation field); only fall
-  // back to a heading paragraph if no list exists. This avoids mistaking the
-  // accessibility-label <p> for the nav content.
-  return candidates.find((div) => [...div.children].some((c) => c.tagName === 'UL'))
-    || candidates.find((div) => [...div.children].some((c) => c.tagName === 'P'))
-    || block;
+  return candidates.find((div) => [...div.children].some((c) => c.tagName === 'P')) || block;
 }
 
 /**
