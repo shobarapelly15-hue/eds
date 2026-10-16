@@ -52,6 +52,11 @@
   margin-left: auto;
 }
 
+/* Secondary (Abbott) logo crowds the mobile top bar — hide until desktop */
+.header-main-right .adc-header-logo-secondary {
+  display: none;
+}
+
 /* ---- Utility Bottom Section (nav bar) ---- */
 .header-utility-bottom {
   background-color: var(--header-utility-bottom-bg, #fff);
@@ -205,6 +210,10 @@ body.header-mobile-menu-open {
 
   .header-cta {
     display: inline-block;
+  }
+
+  .header-main-right .adc-header-logo-secondary {
+    display: flex;
   }
 }
 
